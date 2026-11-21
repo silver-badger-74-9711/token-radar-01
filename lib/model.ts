@@ -47,15 +47,26 @@ const PLAYBOOKS: Record<string, string[]> = {
   'Onchain Capital Allocator': ['inspect allocation policies, strategy exposure and redemption terms', 'deposit a supported asset into a reviewed allocation vault', 'compare current allocations with the published mandate', 'redeem the test allocation and record settlement timing'],
 };
 const FALLBACK = ['inspect the documented product, supported assets and exit conditions', 'preview the smallest supported interaction and execute only if its terms are clear', 'verify the transaction receipt and record any resulting position', 'close the test position using the documented exit flow if available'];
+// Static planning allowances in USD, not live quotes; setup includes bridge/gas funding.
+const CHAIN_COSTS = new Map<string, { setup: number; interaction: number }>([
+  ['Ethereum', { setup: 25, interaction: 15 }],
+  ['Arbitrum', { setup: 2, interaction: 0.5 }],
+  ['Optimism', { setup: 2, interaction: 0.5 }],
+  ['Base', { setup: 2, interaction: 0.25 }],
+  ['Polygon', { setup: 1, interaction: 0.1 }],
+  ['Solana', { setup: 0.1, interaction: 0.01 }],
+]);
+const DEFAULT_CHAIN_COST = { setup: 5, interaction: 2 };
 function farmSteps(p: SnapshotProtocol): string[] {
-  const chain = p.chains.slice(0, 2).join(' and ') || 'the network specified in its official documentation';
-  const tier = p.tvl_usd >= 1e9 ? { label: 'large-TVL', capital: 150, fee: 12, time: 12 }
-    : p.tvl_usd >= 5e7 ? { label: 'mid-TVL', capital: 75, fee: 8, time: 15 }
-    : { label: 'small-TVL', capital: 25, fee: 5, time: 20 };
+  const chain = p.chains[0] || 'the network specified in its official documentation';
+  const costs = CHAIN_COSTS.get(chain) ?? DEFAULT_CHAIN_COST;
+  const tier = p.tvl_usd >= 1e9 ? { label: 'large-TVL', position: '$1,000–$2,000', time: 12 }
+    : p.tvl_usd >= 5e7 ? { label: 'mid-TVL', position: '$300–$750', time: 15 }
+    : { label: 'small-TVL', position: '$100–$250', time: 20 };
   const actions = PLAYBOOKS[p.category ?? ''] ?? FALLBACK;
   return [
-    `For ${p.name} on ${chain}, open the official documentation and verify app addresses; use the ${tier.label} test budget of $${tier.capital} USD. Estimated cost: $0 USD. Time: ${tier.time} minutes.`,
-    ...actions.map((action, i) => `For ${p.name} on ${chain}, ${action}. ${i === 1 ? `Limit ${tier.label} test capital to $${tier.capital} USD; skip if minimums exceed it.` : `Use the ${tier.label} review checklist and save the result.`} Estimated cost: $${i === 1 || i === 3 ? tier.fee : 0} USD${i === 1 ? ' in fees, plus the stated capital' : ''}; actual fees vary. Time: ${i === 1 || i === 3 ? tier.time : 10} minutes${i === 3 ? ' active work; settlement may take longer' : ''}.`),
+    `For ${p.name} on ${chain}, open the official documentation and verify app addresses; review the ${tier.label} position band of ${tier.position} USD against your budget. TVL alone does not establish safety. Estimated cost: $0 USD. Time: ${tier.time} minutes.`,
+    ...actions.map((action, i) => `For ${p.name} on ${chain}, ${action}. ${i === 0 ? 'Set up a wallet and fund gas; bridge only if needed after checking route fees. ' : ''}${i === 1 ? `Suggested ${tier.label} position: ${tier.position} USD; use less or skip if your budget or product minimums do not fit.` : `Use the ${tier.label} review checklist and save the result.`} Estimated cost: $${i === 0 ? costs.setup : i === 1 || i === 3 ? costs.interaction : 0} USD${i === 1 ? ' in fees, plus the stated capital' : ''}; actual fees vary. Time: ${i === 1 || i === 3 ? tier.time : 10} minutes${i === 3 ? ' active work; settlement may take longer' : ''}.`),
   ];
 }
 
