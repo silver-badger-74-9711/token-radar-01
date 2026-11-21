@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Token Radar — the pre-token landscape</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <a class="skip" href="#board">Skip to protocols</a>
+  <main class="shell">
+    <header class="masthead"><a class="brand" href="#"><span class="brand-mark">◎</span> TOKEN RADAR <span class="edition">/ RESEARCH TERMINAL</span></a><span id="snapshot" class="mono"></span></header>
+    <section class="hero">
+      <div><div class="eyebrow"><span class="dot"></span> THE PRE-TOKEN LANDSCAPE</div><h1>Find the signal.<br><span>Before the token.</span></h1><p>A comparables-driven radar for protocols without a recorded token market cap.<br>Explore implied valuations. Inspect the model. Plan your next interaction.</p></div>
+      <div class="radar" aria-hidden="true"><i></i><b></b><span class="blip a"></span><span class="blip b"></span><span class="blip c"></span><small>PRE-TOKEN SIGNALS</small></div>
+      <div class="stats" id="stats"></div>
+    </section>
+    <section class="method"><div><span class="eyebrow">01 / METHODOLOGY</span><h2>How implied value is computed</h2></div><div><p class="formula">TVL <em>×</em> peer multiple <em>×</em> momentum <em>×</em> maturity <em>×</em> breadth</p><p>Category median mcap/TVL from tokenized peers, adjusted by 7d momentum, maturity (age with no token) and chain breadth. Fewer than 4 peers uses the global median; multiples bounded to 0.02–2×. Estimates, not token prices.</p></div></section>
+    <section id="board" aria-labelledby="board-title">
+      <div class="board-heading"><h2 id="board-title">Protocol radar <span id="scope">/ ALL SIGNALS</span></h2><span class="hint">Select a protocol to inspect its valuation & farm plan ↗</span></div>
+      <div class="controls"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" aria-label="Search protocols" placeholder="Search protocol, category or chain…"></label><select id="category" aria-label="Filter category"><option value="">All categories</option></select><button id="watchlist" aria-pressed="false">☆ Watchlist only</button><span id="count" role="status" class="mono"></span></div>
+      <div class="table-wrap"><table><thead><tr><th>#</th><th>Protocol</th><th>Category</th><th>Chains</th><th class="number" data-key="tvl_usd"><button>TVL ↕</button></th><th class="number" data-key="change_7d"><button>7d change ↕</button></th><th class="number" data-key="implied_value_usd"><button>Implied value ↓</button></th><th></th></tr></thead><tbody id="rows"></tbody></table><div id="empty" hidden>No signals match. Try another search or category.</div></div>
+    </section>
+    <footer><span>TOKEN RADAR / SNAPSHOT RESEARCH</span><span>Model: comparables-1 · Farm steps are templates; rewards are not guaranteed.</span></footer>
+  </main>
+  <dialog id="detail" aria-labelledby="detail-title"></dialog>
+  <script src="../data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
